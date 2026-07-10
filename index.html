@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="studentApp">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Student Fee Manager</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+</head>
+
+<body ng-controller="StudentController">
+
+    <div class="container">
+
+        <h1>Student Fee Manager</h1>
+
+        <!-- Search & Filters -->
+
+        <div class="filters">
+
+            <input type="text"
+                   placeholder="Search Student"
+                   ng-model="searchText">
+
+            <select ng-model="courseFilter">
+                <option value="">All Courses</option>
+                <option>BBA</option>
+                <option>B.Com</option>
+                <option>BCA</option>
+                <option>MBA</option>
+                <option>MCA</option>
+                <option>B.Tech</option>
+                <option>Other</option>
+            </select>
+
+            <select ng-model="statusFilter">
+                <option value="">All Status</option>
+                <option>Paid</option>
+                <option>Pending</option>
+                <option>Partial</option>
+                <option>Scholarship</option>
+            </select>
+
+        </div>
+
+        <!-- Form -->
+
+        <form name="studentForm"
+              ng-submit="addStudent(studentForm)"
+              novalidate>
+
+            <label>Student Name</label>
+
+            <input type="text"
+                   ng-model="student.name"
+                   name="name"
+                   minlength="2"
+                   required>
+
+            <span class="error"
+                  ng-show="studentForm.name.$touched && studentForm.name.$invalid">
+                Minimum 2 characters required.
+            </span>
+
+            <label>Course</label>
+
+            <select ng-model="student.course"
+                    name="course"
+                    required>
+
+                <option value="">Select Course</option>
+                <option>BBA</option>
+                <option>B.Com</option>
+                <option>BCA</option>
+                <option>MBA</option>
+                <option>MCA</option>
+                <option>B.Tech</option>
+                <option>Other</option>
+
+            </select>
+
+            <label>Fee Status</label>
+
+            <div class="radio-group">
+
+                <label>
+                    <input type="radio"
+                           ng-model="student.status"
+                           value="Paid"
+                           required>
+                    Paid
+                </label>
+
+                <label>
+                    <input type="radio"
+                           ng-model="student.status"
+                           value="Pending">
+                    Pending
+                </label>
+
+                <label>
+                    <input type="radio"
+                           ng-model="student.status"
+                           value="Partial">
+                    Partial
+                </label>
+
+                <label>
+                    <input type="radio"
+                           ng-model="student.status"
+                           value="Scholarship">
+                    Scholarship
+                </label>
+
+            </div>
+
+            <div ng-if="student.status!='Scholarship'">
+
+                <label>Fee Amount</label>
+
+                <input type="number"
+                       ng-model="student.amount"
+                       name="amount"
+                       min="1"
+                       ng-required="student.status!='Scholarship'">
+
+                <span class="error"
+                      ng-show="studentForm.amount.$touched && studentForm.amount.$invalid">
+                    Enter valid amount.
+                </span>
+
+            </div>
+
+            <label>Joining Mode</label>
+
+            <select ng-model="student.mode"
+                    required>
+
+                <option value="">Select</option>
+                <option>Online</option>
+                <option>Offline</option>
+
+            </select>
+
+            <button type="submit">
+                Add Student
+            </button>
+
+        </form>
+
+        <!-- Counts -->
+
+        <div class="counts">
+
+            <p>Total Students : {{students.length}}</p>
+
+            <p>Paid Students : {{countStatus('Paid')}}</p>
+
+            <p>Pending Students : {{countStatus('Pending')}}</p>
+
+            <p>Partial Students : {{countStatus('Partial')}}</p>
+
+            <p>Scholarship Students : {{countStatus('Scholarship')}}</p>
+
+        </div>
+
+        <button class="clear-btn"
+                ng-click="clearAll()"
+                ng-if="students.length>0">
+            Clear All Students
+        </button>
+
+        <hr>
+
+        <h3 ng-if="students.length==0">
+            No students added yet.
+        </h3>
+
+        <div class="card"
+             ng-repeat="s in filteredStudents=(students
+             | filter:{name:searchText}
+             | filter:{course:courseFilter}
+             | filter:{status:statusFilter})">
+
+            <h2>{{s.name}}</h2>
+
+            <p><b>Course:</b> {{s.course}}</p>
+
+            <p><b>Status:</b> {{s.status}}</p>
+
+            <p>
+                <b>Fee:</b>
+
+                <span ng-if="s.status!='Scholarship'">
+                    ₹{{s.amount}}
+                </span>
+
+                <span ng-if="s.status=='Scholarship'">
+                    Scholarship
+                </span>
+
+            </p>
+
+            <p><b>Joining:</b> {{s.mode}}</p>
+
+            <button ng-click="deleteStudent(s)">
+                Delete
+            </button>
+
+        </div>
+
+        <h3 ng-if="students.length>0 && filteredStudents.length==0">
+            This name is not found.
+        </h3>
+
+    </div>
+
+</body>
+
+</html>
